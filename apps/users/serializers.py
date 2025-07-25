@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework.exceptions import AuthenticationFailed
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import smart_str, smart_bytes, force_str
@@ -10,6 +10,7 @@ from django.urls import reverse
 from .utils import send_normal_email
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
+User = get_user_model()
 
 class UserRegisterSerializer(serializers.ModelSerializer):
 
@@ -38,7 +39,26 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password = validated_data['password']
         )
         return user
-    
+class VerifyEmailSerializer(serializers.Serializer):
+    otp = serializers.CharField(min_length=6, max_length=6)
+
+    def validate(self, attrs):
+        try:
+            uidb64 = attrs.get('uidb64')
+            token = attrs.get('token')
+
+            user_id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=user_id)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                raise AuthenticationFailed('Verification link is invalid or has expired', 401)
+
+            user.is_verified = True
+            user.save()
+            return user
+        except Exception as e:
+            raise AuthenticationFailed('Verification link is invalid or has expired')
+
 class LoginSerializer(serializers.Serializer):
     id            = serializers.IntegerField(read_only=True)
     full_name     = serializers.CharField(read_only=True)
@@ -154,4 +174,10 @@ class LogoutUsererializer(serializers.Serializer):
             token = RefreshToken(self.token)
             token.blacklist()
         except TokenError:
-            return self.fail('bad_token')                          
+            return self.fail('bad_token')
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'is_verified', 'date_joined']
+        read_only_fields = ['id', 'is_verified', 'date_joined']

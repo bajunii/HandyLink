@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .utils import send_code_to_user
 from .models import OneTimePassword, User
+from .serializers import UserRegisterSerializer, LoginSerializer, PasswordResetRequestSerializer
 
 
 from rest_framework.permissions import IsAuthenticated
@@ -130,7 +131,108 @@ class UserRegisterView(GenericAPIView):
               }, status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VerifyUserEmail(GenericAPIView):
+    """
+    Email Verification API
     
+    Verifies user email address using OTP sent during registration.
+    """
+    serializer_class = VerifyEmailSerializer
+    serializer_class = VerifyEmailSerializer
+
+    @swagger_auto_schema(
+        operation_summary='Verify user email with OTP',
+        operation_description="""
+        Verifies a user's email address using the OTP (One-Time Password) sent during registration.
+        
+        **Process:**
+        1. Validates the provided OTP code
+        2. Marks the user account as verified
+        3. Enables the user to login
+        
+        **Note:** Each OTP can only be used once and expires after a certain time.
+        """,
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'otp': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='6-digit One-Time Password sent to user email',
+                    example='123456',
+                    minLength=6,
+                    maxLength=6
+                ),
+            },
+            required=['otp']
+        ),
+        responses={
+            200: openapi.Response(
+                description='Email verified successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Success message',
+                            example='email account verified successfully'
+                        )
+                    }
+                )
+            ),
+            204: openapi.Response(
+                description='User already verified',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Status message',
+                            example='code is invalid user already exist'
+                        )
+                    }
+                )
+            ),
+            404: openapi.Response(
+                description='Invalid OTP',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Error message',
+                            example='passcode not provided'
+                        )
+                    }
+                )
+            )
+        },
+        tags=['Authentication']  # <-- Updated tag for clarity
+    )
+    def post(self, request):
+        otpcode = request.data.get('otp')
+        try:
+            user_code_obj = OneTimePassword.objects.get(code=otpcode)
+            user = user_code_obj.user
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+                return Response({
+                    'message':'email account verified successfully'
+                }, status=status.HTTP_200_OK)
+
+        except OneTimePassword.DoesNotExist:
+            return Response({
+                'message':'Invalid OTP'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({
+                'message':'An error occurred'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({
+            'message':'code is invalid user already exist'
+        }, status=status.HTTP_204_NO_CONTENT)
 
 class LoginUserView(GenericAPIView):
     """
@@ -314,7 +416,7 @@ class VerifyUserEmail(GenericAPIView):
                 )
             )
         },
-        tags=['Authentication']
+        tags=['Authentication']  # <-- Updated tag for clarity
     )
     def post(self, request):
         otpcode = request.data.get('otp')
