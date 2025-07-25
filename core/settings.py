@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.providers',
     'apps.jobs',
+    'apps.reviews',
     'rest_framework',
     'drf_yasg',
 ]
