@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/jobs/', include('apps.jobs.urls')),  # Include jobs app URLs
     path('api/reviews/', include('apps.reviews.urls')),  # Include reviews app URLs
     path('api/payments/', include('apps.payments.urls')),  # Include payments app URLs
+    path('api/notifications/', include('apps.notifications.urls')),  # Include notifications app URLs
 ]

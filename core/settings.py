@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'apps.jobs',
     'apps.reviews',
     'apps.payments',
+    'apps.notifications',
     'rest_framework',
     'drf_yasg',
 ]
