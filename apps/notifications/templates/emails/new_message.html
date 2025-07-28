@@ -1,0 +1,39 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Message Type:</div>
+        <div class="detail-value">💬 New Message</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">From:</div>
+        <div class="detail-value">{{ sender_name }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Subject:</div>
+        <div class="detail-value">{{ message_subject|default:"Project Discussion" }}</div>
+    </div>
+</div>
+
+<div class="notification-message">
+    <p>💬 <strong>New Message!</strong> You have received a new message in your HandyLink inbox.</p>
+    
+    {% if message_preview %}
+    <div style="background: #f8f9fa; border-left: 4px solid #3e92cc; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+        <p><strong>Message Preview:</strong></p>
+        <p style="font-style: italic; color: #555;">"{{ message_preview }}"</p>
+    </div>
+    {% endif %}
+    
+    <p><strong>Best Practices:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>📱 Respond promptly to maintain good communication</li>
+        <li>💼 Keep discussions professional and project-focused</li>
+        <li>📋 Ask clarifying questions if needed</li>
+        <li>🤝 Be courteous and respectful</li>
+    </ul>
+    
+    <p>Quick responses help build trust and lead to successful project outcomes!</p>
+</div>
+{% endblock %}

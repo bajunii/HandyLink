@@ -13,16 +13,50 @@ User = get_user_model()
 # User-related signals
 @receiver(post_save, sender=User)
 def user_created_notification(sender, instance, created, **kwargs):
-    """Send welcome notification when user is created"""
-    if created:
-        NotificationService.create_notification(
-            recipient=instance,
-            notification_type='user_welcome',
-            context_data={
-                'user_name': instance.email,
-            },
-            priority='medium'
-        )
+    """Send welcome notification when user is created and verified"""
+    if created and instance.is_verified:
+        # Only send welcome notification if user is already verified
+        print(f"🔥 Signal triggered for verified user: {instance.email}")
+        
+        try:
+            notification = NotificationService.create_notification(
+                recipient=instance,
+                notification_type='user_welcome',
+                context_data={
+                    'user_name': instance.get_full_name or instance.email,
+                },
+                priority='medium'
+            )
+            print(f"✅ Welcome notification created: {notification.title if notification else 'Failed'}")
+        except Exception as e:
+            print(f"❌ Error creating notification: {e}")
+            import traceback
+            traceback.print_exc()
+    elif created:
+        print(f"👤 User registered but not verified yet: {instance.email} - No welcome email sent")
+
+@receiver(post_save, sender=User)
+def user_verified_notification(sender, instance, created, **kwargs):
+    """Send welcome notification when user becomes verified"""
+    if not created and instance.is_verified:
+        # Check if user was just verified (not already verified)
+        if not getattr(instance, '_was_verified', False):
+            print(f"✅ User verified: {instance.email} - Sending welcome notification")
+            
+            try:
+                notification = NotificationService.create_notification(
+                    recipient=instance,
+                    notification_type='user_welcome',
+                    context_data={
+                        'user_name': instance.get_full_name or instance.email,
+                    },
+                    priority='medium'
+                )
+                print(f"✅ Welcome notification sent after verification: {notification.title if notification else 'Failed'}")
+            except Exception as e:
+                print(f"❌ Error creating welcome notification: {e}")
+                import traceback
+                traceback.print_exc()
 
 # Provider-related signals
 @receiver(post_save, sender=Provider)
@@ -275,6 +309,16 @@ def save_original_review_values(sender, instance, **kwargs):
             instance._original_provider_response = original.provider_response
         except Review.DoesNotExist:
             pass
+
+@receiver(post_save, sender=User)
+def save_original_user_values(sender, instance, **kwargs):
+    """Save original values to track changes"""
+    if instance.pk:
+        try:
+            original = User.objects.get(pk=instance.pk)
+            instance._was_verified = original.is_verified
+        except User.DoesNotExist:
+            instance._was_verified = False
 
 @receiver(post_save, sender=Payment)
 def save_original_payment_values(sender, instance, **kwargs):

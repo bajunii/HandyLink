@@ -1,0 +1,28 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Welcome to:</div>
+        <div class="detail-value">HandyLink Service Marketplace</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Account:</div>
+        <div class="detail-value">{{ recipient_name }}</div>
+    </div>
+</div>
+
+<div class="notification-message">
+    <p>🎉 <strong>Congratulations!</strong> Your HandyLink account has been successfully created.</p>
+    
+    <p><strong>What you can do now:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>🔍 Browse and book services from trusted providers</li>
+        <li>💼 Apply to become a service provider</li>
+        <li>⭐ Leave reviews and build your reputation</li>
+        <li>💳 Secure payments through our platform</li>
+    </ul>
+    
+    <p>Need help getting started? Our support team is here to assist you 24/7.</p>
+</div>
+{% endblock %}

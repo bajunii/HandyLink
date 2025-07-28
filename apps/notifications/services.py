@@ -1,5 +1,6 @@
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.template import Template, Context
+from django.template.loader import render_to_string, get_template
 from django.conf import settings
 from django.utils import timezone
 from .models import Notification, NotificationTemplate, NotificationPreference
@@ -108,7 +109,7 @@ class NotificationService:
     
     @staticmethod
     def _send_email(notification, template, preferences):
-        """Send email notification"""
+        """Send email notification with HTML styling"""
         try:
             # Skip if user disabled email notifications
             if not preferences.email_enabled:
@@ -118,33 +119,81 @@ class NotificationService:
             if NotificationService._is_quiet_hours(preferences):
                 return
             
-            # Render email content
-            context_data = notification.data
+            # Prepare context data for template rendering
+            context_data = notification.data.copy() if notification.data else {}
             context_data.update({
                 'recipient_name': notification.recipient.get_full_name or notification.recipient.email,
                 'notification_title': notification.title,
                 'notification_message': notification.message,
                 'action_url': notification.action_url,
+                'priority': notification.priority,
+                'notification_type': notification.type,
             })
             
+            # Render email subject
             subject = NotificationService._render_template(
                 template.email_subject_template or notification.title,
                 context_data
             )
             
-            body = NotificationService._render_template(
-                template.email_body_template or notification.message,
-                context_data
-            )
+            # Try to use HTML template first, fallback to text
+            html_content = None
+            template_name = f"emails/{notification.type}.html"
             
-            # Send email
-            send_mail(
-                subject=subject,
-                message=body,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[notification.recipient.email],
-                fail_silently=False,
-            )
+            try:
+                # Render HTML email template
+                html_content = render_to_string(template_name, context_data)
+            except Exception as template_error:
+                logger.warning(f"HTML template {template_name} not found: {template_error}")
+                # Fallback to generic template
+                try:
+                    html_content = render_to_string("emails/generic.html", context_data)
+                except Exception as generic_error:
+                    logger.warning(f"Generic template not found: {generic_error}")
+                    # Final fallback to base template
+                    try:
+                        html_content = render_to_string("emails/base.html", context_data)
+                    except Exception as base_error:
+                        logger.error(f"Base template not found: {base_error}")
+                        html_content = None
+            
+            # Create email message
+            if html_content:
+                # Send HTML email
+                email = EmailMessage(
+                    subject=subject,
+                    body=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[notification.recipient.email]
+                )
+                email.content_subtype = "html"  # Set content type to HTML
+                
+                try:
+                    email.send(fail_silently=False)
+                    print(f"✅ HTML email sent to {notification.recipient.email}: {subject}")
+                except Exception as smtp_error:
+                    print(f"❌ SMTP Error: {smtp_error}")
+                    logger.error(f"SMTP Error sending email to {notification.recipient.email}: {smtp_error}")
+                    raise smtp_error
+            else:
+                # Fallback to plain text email
+                body = NotificationService._render_template(
+                    template.email_body_template or notification.message,
+                    context_data
+                )
+                try:
+                    send_mail(
+                        subject=subject,
+                        message=body,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[notification.recipient.email],
+                        fail_silently=False,
+                    )
+                    print(f"✅ Plain text email sent to {notification.recipient.email}: {subject}")
+                except Exception as smtp_error:
+                    print(f"❌ SMTP Error: {smtp_error}")
+                    logger.error(f"SMTP Error sending plain text email to {notification.recipient.email}: {smtp_error}")
+                    raise smtp_error
             
             notification.sent_via_email = True
             notification.save(update_fields=['sent_via_email'])

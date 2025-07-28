@@ -1,0 +1,67 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Job Title:</div>
+        <div class="detail-value">{{ job_title }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Rating:</div>
+        <div class="detail-value">
+            {% for i in "12345" %}
+                {% if forloop.counter <= rating|floatformat:0|add:0 %}
+                    ⭐
+                {% else %}
+                    ☆
+                {% endif %}
+            {% endfor %}
+            ({{ rating }}/5)
+        </div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Reviewer:</div>
+        <div class="detail-value">{{ reviewer_name }}</div>
+    </div>
+</div>
+
+<div class="notification-message">
+    {% if rating >= 4 %}
+        <p>🌟 <strong>Excellent news!</strong> You've received a {{ rating }}-star review!</p>
+        
+        <p>Your outstanding work continues to impress clients. This positive review will:</p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>⬆️ Boost your profile ranking</li>
+            <li>🎯 Attract more quality clients</li>
+            <li>💰 Help you command higher rates</li>
+            <li>🏆 Build your professional reputation</li>
+        </ul>
+        
+    {% elif rating >= 3 %}
+        <p>👍 <strong>Good work!</strong> You've received a {{ rating }}-star review.</p>
+        
+        <p>This is a solid review that shows your reliability. Keep up the good work!</p>
+        
+    {% else %}
+        <p>📝 You've received a {{ rating }}-star review. This is an opportunity to improve.</p>
+        
+        <p><strong>Steps to enhance your service:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>📞 Reach out to the client to understand their concerns</li>
+            <li>🔧 Address any issues mentioned in the review</li>
+            <li>📚 Consider additional training or skill development</li>
+            <li>💬 Improve communication with future clients</li>
+        </ul>
+    {% endif %}
+    
+    <p><strong>Review Management Tips:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>📱 Respond professionally to the review</li>
+        <li>🤝 Thank the client for their feedback</li>
+        <li>🔄 Use feedback to improve your services</li>
+        <li>📊 Monitor your overall rating regularly</li>
+    </ul>
+    
+    <p>Every review is valuable feedback that helps you grow your business!</p>
+</div>
+{% endblock %}

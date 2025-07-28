@@ -1,0 +1,42 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Notification Type:</div>
+        <div class="detail-value">{{ notification_type|title }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Priority:</div>
+        <div class="detail-value">
+            {% if priority == 'high' %}
+                🔴 High Priority
+            {% elif priority == 'medium' %}
+                🟡 Medium Priority
+            {% else %}
+                🟢 Low Priority
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="notification-message">
+    <p>📢 <strong>HandyLink Notification</strong></p>
+    
+    {% if notification_message %}
+        <div style="background: #f8f9fa; border-left: 4px solid #3e92cc; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+            {{ notification_message|linebreaks }}
+        </div>
+    {% endif %}
+    
+    <p><strong>What you can do:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>📱 Check your dashboard for more details</li>
+        <li>🔍 Review any related items or actions needed</li>
+        <li>💬 Contact support if you have questions</li>
+        <li>⚙️ Update your notification preferences if needed</li>
+    </ul>
+    
+    <p>Stay connected with HandyLink for the best experience!</p>
+</div>
+{% endblock %}
