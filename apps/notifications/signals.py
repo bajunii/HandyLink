@@ -19,7 +19,7 @@ def user_created_notification(sender, instance, created, **kwargs):
             recipient=instance,
             notification_type='user_welcome',
             context_data={
-                'user_name': instance.get_full_name() or instance.email,
+                'user_name': instance.email,
             },
             priority='medium'
         )
@@ -28,24 +28,24 @@ def user_created_notification(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Provider)
 def provider_status_notification(sender, instance, created, **kwargs):
     """Send notification when provider status changes"""
-    if not created and instance.is_approved != getattr(instance, '_original_is_approved', None):
-        if instance.is_approved:
+    if not created and instance.status != getattr(instance, '_original_status', None):
+        if instance.status == 'approved':
             NotificationService.create_notification(
                 recipient=instance.user,
                 notification_type='provider_approved',
                 context_data={
-                    'user_name': instance.user.get_full_name() or instance.user.email,
+                    'user_name': instance.user.get_full_name or instance.user.email,
                     'business_name': instance.business_name,
                 },
                 related_provider=instance,
                 priority='high'
             )
-        else:
+        elif instance.status == 'rejected':
             NotificationService.create_notification(
                 recipient=instance.user,
                 notification_type='provider_rejected',
                 context_data={
-                    'user_name': instance.user.get_full_name() or instance.user.email,
+                    'user_name': instance.user.get_full_name or instance.user.email,
                     'business_name': instance.business_name,
                 },
                 related_provider=instance,
@@ -62,7 +62,7 @@ def job_application_notification(sender, instance, created, **kwargs):
             recipient=instance.job.posted_by,
             notification_type='job_application',
             context_data={
-                'user_name': instance.job.posted_by.get_full_name() or instance.job.posted_by.email,
+                'user_name': instance.job.posted_by.get_full_name or instance.job.posted_by.email,
                 'job_title': instance.job.title,
                 'provider_name': instance.provider.business_name,
                 'bid_amount': str(instance.bid_amount),
@@ -83,7 +83,7 @@ def application_status_notification(sender, instance, created, **kwargs):
                 recipient=instance.provider.user,
                 notification_type='application_response',
                 context_data={
-                    'user_name': instance.provider.user.get_full_name() or instance.provider.user.email,
+                    'user_name': instance.provider.user.get_full_name or instance.provider.user.email,
                     'job_title': instance.job.title,
                     'status': instance.status,
                 },
@@ -105,7 +105,7 @@ def job_status_notification(sender, instance, created, **kwargs):
                     recipient=instance.posted_by,
                     notification_type='job_completed',
                     context_data={
-                        'user_name': instance.posted_by.get_full_name() or instance.posted_by.email,
+                        'user_name': instance.posted_by.get_full_name or instance.posted_by.email,
                         'job_title': instance.title,
                         'provider_name': instance.assigned_to.business_name,
                     },
@@ -119,7 +119,7 @@ def job_status_notification(sender, instance, created, **kwargs):
                     recipient=instance.assigned_to.user,
                     notification_type='job_completed',
                     context_data={
-                        'user_name': instance.assigned_to.user.get_full_name() or instance.assigned_to.user.email,
+                        'user_name': instance.assigned_to.user.get_full_name or instance.assigned_to.user.email,
                         'job_title': instance.title,
                     },
                     related_job=instance,
@@ -134,7 +134,7 @@ def job_status_notification(sender, instance, created, **kwargs):
                         recipient=instance.assigned_to.user,
                         notification_type='job_cancelled',
                         context_data={
-                            'user_name': instance.assigned_to.user.get_full_name() or instance.assigned_to.user.email,
+                            'user_name': instance.assigned_to.user.get_full_name or instance.assigned_to.user.email,
                             'job_title': instance.title,
                         },
                         related_job=instance,
@@ -152,10 +152,10 @@ def review_notification(sender, instance, created, **kwargs):
             recipient=instance.provider.user,
             notification_type='review_received',
             context_data={
-                'user_name': instance.provider.user.get_full_name() or instance.provider.user.email,
+                'user_name': instance.provider.user.get_full_name or instance.provider.user.email,
                 'job_title': instance.job.title,
                 'rating': instance.rating,
-                'reviewer_name': instance.reviewer.get_full_name() or instance.reviewer.email,
+                'reviewer_name': instance.reviewer.get_full_name or instance.reviewer.email,
             },
             related_review=instance,
             related_job=instance.job,
@@ -170,7 +170,7 @@ def review_notification(sender, instance, created, **kwargs):
                 recipient=instance.reviewer,
                 notification_type='review_response',
                 context_data={
-                    'user_name': instance.reviewer.get_full_name() or instance.reviewer.email,
+                    'user_name': instance.reviewer.get_full_name or instance.reviewer.email,
                     'job_title': instance.job.title,
                     'provider_name': instance.provider.business_name,
                 },
@@ -193,7 +193,7 @@ def payment_notification(sender, instance, created, **kwargs):
                     recipient=instance.provider.user,
                     notification_type='payment_received',
                     context_data={
-                        'user_name': instance.provider.user.get_full_name() or instance.provider.user.email,
+                        'user_name': instance.provider.user.get_full_name or instance.provider.user.email,
                         'job_title': instance.job.title,
                         'amount': str(instance.provider_amount),
                     },
@@ -208,7 +208,7 @@ def payment_notification(sender, instance, created, **kwargs):
                     recipient=instance.payer,
                     notification_type='payment_received',
                     context_data={
-                        'user_name': instance.payer.get_full_name() or instance.payer.email,
+                        'user_name': instance.payer.get_full_name or instance.payer.email,
                         'job_title': instance.job.title,
                         'amount': str(instance.amount),
                         'provider_name': instance.provider.business_name,
@@ -225,7 +225,7 @@ def payment_notification(sender, instance, created, **kwargs):
                     recipient=instance.payer,
                     notification_type='payment_failed',
                     context_data={
-                        'user_name': instance.payer.get_full_name() or instance.payer.email,
+                        'user_name': instance.payer.get_full_name or instance.payer.email,
                         'job_title': instance.job.title,
                         'amount': str(instance.amount),
                     },
@@ -242,7 +242,7 @@ def save_original_provider_values(sender, instance, **kwargs):
     if instance.pk:
         try:
             original = Provider.objects.get(pk=instance.pk)
-            instance._original_is_approved = original.is_approved
+            instance._original_status = original.status
         except Provider.DoesNotExist:
             pass
 

@@ -121,7 +121,7 @@ class NotificationService:
             # Render email content
             context_data = notification.data
             context_data.update({
-                'recipient_name': notification.recipient.get_full_name() or notification.recipient.email,
+                'recipient_name': notification.recipient.get_full_name or notification.recipient.email,
                 'notification_title': notification.title,
                 'notification_message': notification.message,
                 'action_url': notification.action_url,
