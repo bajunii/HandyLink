@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandyLink Notification</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #0a2463 0%, #3e92cc 100%);
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .logo-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .notification-title {
+            font-size: 24px;
+            color: #0a2463;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .notification-message {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .notification-details {
+            background: #f8f9fa;
+            border-left: 4px solid #3e92cc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #0a2463;
+            min-width: 100px;
+        }
+        
+        .detail-value {
+            color: #555;
+        }
+        
+        .action-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3e92cc 0%, #2a9d8f 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(62, 146, 204, 0.3);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(62, 146, 204, 0.4);
+        }
+        
+        .priority-high {
+            border-left-color: #dc3545;
+        }
+        
+        .priority-medium {
+            border-left-color: #ffc107;
+        }
+        
+        .priority-low {
+            border-left-color: #28a745;
+        }
+        
+        .email-footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        
+        .footer-links {
+            margin: 20px 0;
+        }
+        
+        .footer-links a {
+            color: #3e92cc;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        
+        .unsubscribe {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .unsubscribe a {
+            color: #999;
+            text-decoration: underline;
+        }
+        
+        .social-icons {
+            margin: 20px 0;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            margin: 0 10px;
+            width: 40px;
+            height: 40px;
+            background: #3e92cc;
+            color: white;
+            text-align: center;
+            line-height: 40px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background: #0a2463;
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .email-header,
+            .email-body,
+            .email-footer {
+                padding: 20px;
+            }
+            
+            .notification-title {
+                font-size: 20px;
+            }
+            
+            .action-button {
+                display: block;
+                text-align: center;
+                margin: 20px 0;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+            }
+            
+            .detail-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <div class="logo">HandyLink</div>
+            <div class="logo-subtitle">YOUR TRUSTED SERVICE MARKETPLACE</div>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <div class="notification-title">{{ notification_title }}</div>
+            <div class="notification-message">{{ notification_message }}</div>
+            
+            {% block content %}
+            <!-- Additional content will be inserted here -->
+            {% endblock %}
+            
+            {% if action_url %}
+            <div style="text-align: center;">
+                <a href="{{ action_url }}" class="action-button">View Details</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="footer-text">
+                <strong>HandyLink Team</strong><br>
+                Connecting you with trusted service providers
+            </div>
+            
+            <div class="footer-links">
+                <a href="#" target="_blank">Dashboard</a>
+                <a href="#" target="_blank">Support</a>
+                <a href="#" target="_blank">Privacy Policy</a>
+            </div>
+            
+            <div class="social-icons">
+                <a href="#" target="_blank" title="Facebook">f</a>
+                <a href="#" target="_blank" title="Twitter">t</a>
+                <a href="#" target="_blank" title="LinkedIn">in</a>
+                <a href="#" target="_blank" title="Instagram">ig</a>
+            </div>
+            
+            <div class="unsubscribe">
+                You received this email because you have an account with HandyLink.<br>
+                <a href="#">Manage notification preferences</a> | <a href="#">Unsubscribe</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

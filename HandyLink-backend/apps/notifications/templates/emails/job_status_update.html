@@ -1,0 +1,67 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Job Title:</div>
+        <div class="detail-value">{{ job_title }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Status Update:</div>
+        <div class="detail-value">
+            {% if status == 'completed' %}
+                ✅ Completed
+            {% elif status == 'cancelled' %}
+                ❌ Cancelled
+            {% elif status == 'in_progress' %}
+                🔄 In Progress
+            {% else %}
+                📋 {{ status|title }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="notification-message">
+    {% if status == 'completed' %}
+        <p>🎉 <strong>Job Completed!</strong> Great work on finishing this project.</p>
+        
+        <p><strong>Next steps:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>💰 Payment will be processed within 24 hours</li>
+            <li>⭐ Leave a review for your client</li>
+            <li>📸 Add this project to your portfolio</li>
+            <li>🔍 Look for your next opportunity</li>
+        </ul>
+        
+    {% elif status == 'cancelled' %}
+        <p>❌ <strong>Job Cancelled:</strong> This project has been cancelled.</p>
+        
+        <p><strong>What this means:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>🚫 No further work is required</li>
+            <li>💰 Payment for completed work will be processed</li>
+            <li>📞 Contact support if you have concerns</li>
+            <li>🔍 Browse other available opportunities</li>
+        </ul>
+        
+    {% elif status == 'in_progress' %}
+        <p>🔄 <strong>Job Started!</strong> Your project is now in progress.</p>
+        
+        <p><strong>Important reminders:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>📅 Stick to agreed timelines</li>
+            <li>💬 Maintain regular communication with the client</li>
+            <li>📋 Update progress regularly</li>
+            <li>🔧 Deliver quality work as promised</li>
+        </ul>
+        
+    {% else %}
+        <p>📋 Job status updated to: <strong>{{ status|title }}</strong></p>
+        
+        <p>Please check your dashboard for more details about this change.</p>
+    {% endif %}
+    
+    <p>Keep up the excellent work and maintain your professional reputation!</p>
+</div>
+{% endblock %}

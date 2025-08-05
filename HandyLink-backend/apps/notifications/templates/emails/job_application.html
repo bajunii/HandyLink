@@ -1,0 +1,32 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Job Title:</div>
+        <div class="detail-value">{{ job_title }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Applicant:</div>
+        <div class="detail-value">{{ provider_name }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Status:</div>
+        <div class="detail-value">✅ New Application</div>
+    </div>
+</div>
+
+<div class="notification-message">
+    <p>📝 <strong>Great news!</strong> You have received a new application for your job posting.</p>
+    
+    <p><strong>Next steps:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>📋 Review the provider's profile and portfolio</li>
+        <li>💬 Send a message to discuss project details</li>
+        <li>✅ Accept or decline the application</li>
+        <li>📅 Schedule a consultation if needed</li>
+    </ul>
+    
+    <p>Don't keep talented providers waiting - respond promptly to get the best candidates!</p>
+</div>
+{% endblock %}

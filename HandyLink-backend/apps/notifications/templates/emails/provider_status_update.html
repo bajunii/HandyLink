@@ -1,0 +1,83 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Provider:</div>
+        <div class="detail-value">{{ provider_name }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Application Status:</div>
+        <div class="detail-value">
+            {% if status == 'approved' %}
+                ✅ Approved
+            {% elif status == 'rejected' %}
+                ❌ Rejected  
+            {% elif status == 'suspended' %}
+                ⏸️ Suspended
+            {% else %}
+                ⏳ {{ status|title }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="notification-message">
+    {% if status == 'approved' %}
+        <p>🎉 <strong>Congratulations!</strong> Your provider application has been approved!</p>
+        
+        <p><strong>You can now:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>🔍 Browse and apply for available jobs</li>
+            <li>📝 Create your detailed provider profile</li>
+            <li>📸 Upload portfolio images and examples</li>
+            <li>💼 Start building your reputation on HandyLink</li>
+        </ul>
+        
+        <p><strong>Tips for success:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>📱 Respond quickly to job applications</li>
+            <li>💬 Maintain professional communication</li>
+            <li>⭐ Deliver quality work to earn positive reviews</li>
+            <li>📅 Be reliable with scheduling and deadlines</li>
+        </ul>
+        
+    {% elif status == 'rejected' %}
+        <p>😔 Unfortunately, your provider application was not approved at this time.</p>
+        
+        <p><strong>Common reasons for rejection:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>📄 Incomplete application or missing documents</li>
+            <li>🏆 Insufficient experience or qualifications</li>
+            <li>📍 Service area not currently supported</li>
+            <li>🔍 Background check or verification issues</li>
+        </ul>
+        
+        <p><strong>Next steps:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>📧 Contact our support team for specific feedback</li>
+            <li>📚 Gain additional experience and reapply</li>
+            <li>📋 Ensure all required documents are complete</li>
+            <li>🔄 Submit a new application after addressing issues</li>
+        </ul>
+        
+    {% elif status == 'suspended' %}
+        <p>⚠️ Your provider account has been temporarily suspended.</p>
+        
+        <p><strong>During suspension:</strong></p>
+        <ul style="margin: 15px 0; padding-left: 20px;">
+            <li>❌ You cannot apply for new jobs</li>
+            <li>💼 Existing projects may be affected</li>
+            <li>📞 Please contact support immediately</li>
+            <li>🔍 Review our terms of service</li>
+        </ul>
+        
+    {% else %}
+        <p>📋 Your provider application status has been updated to: <strong>{{ status|title }}</strong></p>
+        
+        <p>Please check your dashboard for more details and any additional requirements.</p>
+    {% endif %}
+    
+    <p>If you have questions, our support team is here to help!</p>
+</div>
+{% endblock %}

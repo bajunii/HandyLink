@@ -1,0 +1,40 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<div class="notification-details">
+    <div class="detail-row">
+        <div class="detail-label">Job Title:</div>
+        <div class="detail-value">{{ job_title }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Payment Amount:</div>
+        <div class="detail-value" style="font-weight: bold; color: #28a745; font-size: 18px;">${{ amount }}</div>
+    </div>
+    <div class="detail-row">
+        <div class="detail-label">Payment Date:</div>
+        <div class="detail-value">{{ payment_date|default:"Today" }}</div>
+    </div>
+</div>
+
+<div class="notification-message">
+    <p>💰 <strong>Payment Received!</strong> Congratulations on completing another successful project.</p>
+    
+    <p><strong>Payment Details:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>💳 Payment has been processed securely</li>
+        <li>🏦 Funds will be available in your account within 1-3 business days</li>
+        <li>📧 You'll receive a separate receipt for tax purposes</li>
+        <li>⭐ Don't forget to leave a review for your client</li>
+    </ul>
+    
+    <p><strong>Keep growing your business:</strong></p>
+    <ul style="margin: 15px 0; padding-left: 20px;">
+        <li>🔍 Browse new job opportunities</li>
+        <li>📈 Update your portfolio with this completed project</li>
+        <li>🤝 Maintain good relationships with satisfied clients</li>
+        <li>💼 Consider offering additional services</li>
+    </ul>
+    
+    <p>Thank you for being a valued member of the HandyLink community!</p>
+</div>
+{% endblock %}
